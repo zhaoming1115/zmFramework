@@ -159,7 +159,7 @@ end_def_interface(i_SerialPort_t) /*do not remove this for forward compatibility
 #define __Init_SerialPort(__SerialPort,__PortIndex,__Setting,__InitParm,__EventHandler)	 memset(__SerialPort,0,sizeof(c_SerialPort_t)); \
 																						with(__SerialPort){ \
 																							*(const i_com_t**)(&_->Manager)=&zmSerialPortManager->use_as__i_com_t; \
-																							*(char*)(&_->PortIndex)=__PortIndex; \
+																							*(char*)(&_->PortIndex)=zmCOM_CreatePortID(__PortIndex,zmCOM_Type_SerialPort); \
 																							_->InitSetting=__Setting; \
 																						} \
 																						zmSerialPortManager->Init(&(__SerialPort)->use_as__c_com_t,(__InitParm),__EventHandler)

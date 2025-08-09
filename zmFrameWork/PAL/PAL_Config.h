@@ -33,6 +33,10 @@
 #define SerialPort_FrameSizeLevel_Default			8
 #define SerialPort_QueueFrameCount_Default			4
 
+#define I2C_PrintfError								COM_PrintfError
+#define I2C_FrameSizeLevel_Default					5
+#define I2C_QueueFrameCount_Default					1
+
 /*========================================================== ´æ´¢ =================================================================*/
 #define Storage_PrintfError							printf
 

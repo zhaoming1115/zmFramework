@@ -192,7 +192,7 @@ int UHC_COM_PacketSended(const c_com_t* const me,__InOut const char** data,__InO
 		int len=MyQueueManager->Dequeue(Queue,NULL,SendedLen);
 		if(len<0)
 		{
-			COM_PrintfError("串口%d包发完了，出队时出现了异常(%d)\n",this->PortIndex,len);
+			COM_PrintfError("端口%d包发完了，出队时出现了异常(%d)\n",this->PortIndex,len);
 			return len;
 		}
 		u_QueueState_t QueueState=MyQueueManager->GetState(Queue);
@@ -237,7 +237,7 @@ void UHC_COM_DataReceived(const c_com_t* const me,unsigned int DataLength,bool B
 		{
 			len=MyQueueManager->Enqueue(Queue,NULL,0);
 		}
-		COM_OnDataReceivedEvent(QueueState.AlarmState.PartFrameFlag);
+		COM_OnDataReceivedEvent(!QueueState.AlarmState.PartFrameFlag);
 	}
 	else
 	{

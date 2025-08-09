@@ -10,6 +10,7 @@
       <TargetName>Debug</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pArmCC>6210000::V6.21::ARMCLANG</pArmCC>
       <pCCUsed>6210000::V6.21::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
@@ -513,6 +514,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\zmFrameWork\PAL\zmPWM\zmPWM.c</FilePath>
             </File>
+            <File>
+              <FileName>zmI2C.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\zmFrameWork\PAL\zmCOM\zmI2C\zmI2C.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -602,6 +608,11 @@
               <FileName>UH_ThreadTimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HAL\src\UH_ThreadTimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>UH_I2C.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HAL\src\UH_I2C.c</FilePath>
             </File>
           </Files>
         </Group>

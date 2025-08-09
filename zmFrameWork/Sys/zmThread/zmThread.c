@@ -52,7 +52,7 @@
 
 #include "../zmSys/zmSys.h"
 
-#if Thread_UseTimer
+#ifdef Thread_UseTimer
 #include "../../HAL_Interface/HAL_Interface_ThreadTimer.h"
 #endif
 
@@ -197,12 +197,13 @@ inline static c_Thread_t* Thread_CreateFirstThread(void)
 	memset(_first,0,size);
 	_first->NextCallTick=Thread_GetTick();
 	_first->Porcess=Thread_Service;
-#if Thread_UseTimer
+#ifdef Thread_UseTimer
 	_first->ThreadID=1;
 	_first->ThreadYouXianJi=Thread_YXJ_CallByLunXun;
 	_first->ThreadState=Thread_State_Alive;
 #endif
 	ZT_INIT((s_ProtoThread_t*)_first);
+//	Sys_PrintfMainInfo("任务参数：%p,任务池地址：%p,任务池容量：%d\n",&g_RunParm,_first,g_Config->MaxThreadCount);
 	return _first;
 }
 
@@ -228,7 +229,7 @@ int Thread_init(const s_Thread_cfg_t *ptCFG,unsigned int SysTickPrescalerLevel)
 	g_Config=ptCFG;
 	c_Thread_t* first=Thread_CreateFirstThread();
 	zmListManager->Add(&g_RunParm.FirstThread[0],&first->use_as__c_ListItem_t);
-#if Thread_UseTimer
+#ifdef Thread_UseTimer
 	UH_ThreadTimer_Init(1<<(g_Config->TimerTickUnitLevel+SysTickPrescalerLevel));
 #endif
 	Thread_InitConvParm();
@@ -257,7 +258,7 @@ static void Thread_Run(void)
 	} 
 }
 
-#if Thread_UseTimer
+#ifdef Thread_UseTimer
 static void Thread_OnTimerThread(int MinDelay)
 {
 	c_List_t* CurList=&g_RunParm.FirstThread[Thread_YXJ_CallByTimer];
@@ -469,7 +470,7 @@ static c_Thread_t* Thread_CreateAddThread(f_ThreadProcess Process,e_ThreadYouXia
 		NewThread->NextCallTick=Thread_GetTick();
 		Thread_AddThread(NewThread,&g_RunParm.FirstThread[YouXianJi]);
 
-#if Thread_UseTimer
+#ifdef Thread_UseTimer
 		if (YouXianJi>0 )
 		{
 			Thread_OnTimerThread(g_Config->TimerIntMinDelayUnit);

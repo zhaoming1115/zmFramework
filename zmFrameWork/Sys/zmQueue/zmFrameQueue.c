@@ -115,7 +115,8 @@ c_Queue_t *  FrameQueue_Create (const s_Queue_cfg_t *Config)
 	const s_Queue_cfg_t* cfg=Config;
 	unsigned int ElementSize=FrameQueue_GetElementSize();
 	unsigned int bufsize=ElementSize*(unsigned int)Config->ElementCount;
-	unsigned int ElementInfoSize=(ElementSize>1)?(ElementSize*sizeof(s_ElementsHeader_t)+3)&~3:0;
+//	unsigned int ElementInfoSize=(ElementSize>1)?(ElementSize*sizeof(s_ElementsHeader_t)+3)&~3:0;
+	unsigned int ElementInfoSize=(ElementSize>1)?(Config->ElementCount*sizeof(s_ElementsHeader_t)+3)&~3:0;
 
 	unsigned int length=sizeof(c_Queue_t)+bufsize+ElementInfoSize;
 	char* _buf=(char*)Sys_Malloc(length);

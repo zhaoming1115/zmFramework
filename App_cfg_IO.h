@@ -31,4 +31,6 @@
 
 #define PWM_CHANNEL_ID											0
 
+#define I2C_Node_ID												0
+
 #endif

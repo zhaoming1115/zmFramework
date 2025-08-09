@@ -14,21 +14,21 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-/*æœ¬æ–‡ä»¶åŸºäºŽPLOOCå®šåˆ¶ï¼Œä»¥ä¸Šæ˜¯åŽŸç‰ˆè¯´æ˜Ž*/
+/*±¾ÎÄ¼þ»ùÓÚPLOOC¶¨ÖÆ£¬ÒÔÉÏÊÇÔ­°æËµÃ÷*/
 /*****************************************************************************
-----------------------------------å¼€å‘è€…ä¿¡æ¯---------------------------------
-å¼€ å‘ è€…ï¼šèµµæ˜Ž
+----------------------------------¿ª·¢ÕßÐÅÏ¢---------------------------------
+¿ª ·¢ Õß£ºÕÔÃ÷
 
-----------------------------------æ–‡ä»¶ä¿¡æ¯------------------------------------
-æ–‡ ä»¶ åï¼š zmStorage.h 
-å¼€å‘æ—¥æœŸï¼š2025-03-26 
-æ–‡ä»¶åŠŸèƒ½ï¼šå®šä¹‰å­˜å‚¨å™¨å¯¹è±¡ç›¸å…³çš„ç±»ã€‚
+----------------------------------ÎÄ¼þÐÅÏ¢------------------------------------
+ÎÄ ¼þ Ãû£º zmStorage.h 
+¿ª·¢ÈÕÆÚ£º2025-03-26 
+ÎÄ¼þ¹¦ÄÜ£º¶¨Òå´æ´¢Æ÷¶ÔÏóÏà¹ØµÄÀà¡£
 
-æ    è¿°ï¼šå­˜å‚¨å™¨ç®¡ç†å™¨å¯¹è±¡å¯ç»Ÿä¸€ç®¡ç†å¤šä¸ªä¸åŒç±»åž‹çš„å­˜å‚¨å™¨ï¼Œå…¶é€šè¿‡åœ°å€è¿›è¡ŒåŒºåˆ†ã€‚
+Ãè    Êö£º´æ´¢Æ÷¹ÜÀíÆ÷¶ÔÏó¿ÉÍ³Ò»¹ÜÀí¶à¸ö²»Í¬ÀàÐÍµÄ´æ´¢Æ÷£¬ÆäÍ¨¹ýµØÖ·½øÐÐÇø·Ö¡£
 
------------------------------------ç‰ˆæœ¬ä¿¡æ¯-----------------------------------
-ç‰ˆ    æœ¬ï¼šV1.0.0.0
-ç‰ˆæœ¬è¯´æ˜Žï¼šæ–°åˆ›å»º
+-----------------------------------°æ±¾ÐÅÏ¢-----------------------------------
+°æ    ±¾£ºV1.0.0.0
+°æ±¾ËµÃ÷£ºÐÂ´´½¨
 
 *******************************************************************************/
 
@@ -43,7 +43,7 @@
 #include "Sys/Sys_DataType.h"
 
 /*============================ MACROS ========================================*/
-#define Storage_WriteAddressForFlush			0			//å½“å†™å‡½æ•°ä¼ å…¥è¯¥åœ°å€æ—¶ï¼Œæ‰§è¡ŒFLUSHæ“ä½œï¼Œç›®çš„æ˜¯ä¸ºäº†é€šè¿‡ä¸€ä¸ªæŽ¥å£å®žçŽ°å­˜å‚¨å™¨çš„å®Œæ•´å†™å…¥åŠŸèƒ½
+#define Storage_WriteAddressForFlush			0			//µ±Ð´º¯Êý´«Èë¸ÃµØÖ·Ê±£¬Ö´ÐÐFLUSH²Ù×÷£¬Ä¿µÄÊÇÎªÁËÍ¨¹ýÒ»¸ö½Ó¿ÚÊµÏÖ´æ´¢Æ÷µÄÍêÕûÐ´Èë¹¦ÄÜ
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -51,7 +51,7 @@ typedef enum
 {
 	Storage_State_IDLE,
 	Storage_State_Busy=!Storage_State_IDLE,
-}e_StorageState_t;//å­˜å‚¨å™¨çŠ¶æ€
+}e_StorageState_t;//´æ´¢Æ÷×´Ì¬
 
 /*! \NOTE: Make sure #include "plooc_class.h" is close to the class definition 
  */
@@ -92,104 +92,104 @@ end_def_class(c_Storage_t) /* do not remove this for forward compatibility  */
 typedef struct Storage_cfg_t {
     
     //! put your configuration members here
-	unsigned char EWInfoCount;	//æ“¦å†™ä¿¡æ¯æ•°é‡ï¼Œæœ€å°ä¸º1ï¼Œå½“æœ‰å¤šä»»åŠ¡åŒæ—¶æ“ä½œå­˜å‚¨å™¨ä¸”éœ€è¦å¼‚æ­¥æ“¦å†™æ—¶ï¼Œå¯ä»¥è®¾ç½®æ›´å¤§çš„æ•°ã€‚ç®¡ç†å™¨ä¼šè‡ªåŠ¨ç”„åˆ«æŽ’åºï¼Œä»¥ç¡®ä¿å¯¹åŒä¸€ä¸ªå­˜å‚¨å™¨çš„ä¸²è¡Œæ“ä½œ
-} s_Storage_cfg_t;//å­˜å‚¨å™¨é…ç½®
+	unsigned char EWInfoCount;	//²ÁÐ´ÐÅÏ¢ÊýÁ¿£¬×îÐ¡Îª1£¬µ±ÓÐ¶àÈÎÎñÍ¬Ê±²Ù×÷´æ´¢Æ÷ÇÒÐèÒªÒì²½²ÁÐ´Ê±£¬¿ÉÒÔÉèÖÃ¸ü´óµÄÊý¡£¹ÜÀíÆ÷»á×Ô¶¯Õç±ðÅÅÐò£¬ÒÔÈ·±£¶ÔÍ¬Ò»¸ö´æ´¢Æ÷µÄ´®ÐÐ²Ù×÷
+} s_Storage_cfg_t;//´æ´¢Æ÷ÅäÖÃ
 
 #define Append_StorageConfig_Default()		{1}
 
 def_interface(i_StorageEvent_t)
-	void (*BlockErasing)(unsigned int Address,int Length);						//å—å°†è¦å¼€å§‹æ“¦é™¤
-	void (*BlockErased)(unsigned int Address,int Length);						//å—æ“¦é™¤å®Œæ¯•
+	void (*BlockErasing)(unsigned int Address,int Length);						//¿é½«Òª¿ªÊ¼²Á³ý
+	void (*BlockErased)(unsigned int Address,int Length);						//¿é²Á³ýÍê±Ï
 end_def_interface(i_StorageEvent_t) /*do not remove this for forward compatibility */
 
 //! \name interface i_Storage_t
 //! @{
 def_interface(i_Storage_t)
     int (*Init)(const s_Storage_cfg_t *const ptCFG,const i_StorageEvent_t* const Event);
-	/*å‡½æ•°è¯´æ˜Žï¼šè¯»å–å­˜å‚¨è®¾å¤‡çš„æ•°æ®
-	å‚æ•°è¯´æ˜Žï¼š
-	è¾“å…¥å‚æ•°ï¼š
-	Address-å­˜å‚¨è®¾å¤‡çš„æ•°æ®ç´¢å¼•åœ°å€
-	*ToData-è¦è¯»å–åˆ°çš„å†…å­˜æŒ‡é’ˆ
-	ByteCount-è¦è¯»å–çš„å­—èŠ‚é‡
-	è¿”å›žï¼šè‹¥ToDataä¸ºç©ºï¼Œåˆ™è¯»å–åˆ°ç¼“å­˜åŒºä¸­ï¼Œå¹¶è¿”å›žç¼“å­˜åŒºçš„åœ°å€ï¼› 
-		å¦åˆ™ï¼š>=0-å®žé™…è¯»å–çš„æ•°é‡ï¼›<0-å¼‚å¸¸
+	/*º¯ÊýËµÃ÷£º¶ÁÈ¡´æ´¢Éè±¸µÄÊý¾Ý
+	²ÎÊýËµÃ÷£º
+	ÊäÈë²ÎÊý£º
+	Address-´æ´¢Éè±¸µÄÊý¾ÝË÷ÒýµØÖ·
+	*ToData-Òª¶ÁÈ¡µ½µÄÄÚ´æÖ¸Õë
+	ByteCount-Òª¶ÁÈ¡µÄ×Ö½ÚÁ¿
+	·µ»Ø£ºÈôToDataÎª¿Õ£¬Ôò¶ÁÈ¡µ½»º´æÇøÖÐ£¬²¢·µ»Ø»º´æÇøµÄµØÖ·£» 
+		·ñÔò£º>=0-Êµ¼Ê¶ÁÈ¡µÄÊýÁ¿£»<0-Òì³£
 	*/
 	int (*Read)(unsigned int Address,char* ToData,unsigned int ByteCount);
 
-	/*å‡½æ•°è¯´æ˜Žï¼šå°†æŒ‡å®šæ•°é‡çš„æ•°æ®å†™å…¥å­˜å‚¨è®¾å¤‡
-	å‚æ•°è¯´æ˜Žï¼š
-	è¾“å…¥å‚æ•°ï¼š
-	Address-è¦å†™å…¥çš„åœ°å€
-	*FromData-æ•°æ®æ¥æºå†…å­˜æŒ‡é’ˆ
-	ByteCount-è¦å†™å…¥çš„å­—èŠ‚é‡
-	è¿”å›žï¼š>=0-å®žé™…å†™å…¥çš„æ•°é‡ï¼›<0-å¼‚å¸¸
+	/*º¯ÊýËµÃ÷£º½«Ö¸¶¨ÊýÁ¿µÄÊý¾ÝÐ´Èë´æ´¢Éè±¸
+	²ÎÊýËµÃ÷£º
+	ÊäÈë²ÎÊý£º
+	Address-ÒªÐ´ÈëµÄµØÖ·
+	*FromData-Êý¾ÝÀ´Ô´ÄÚ´æÖ¸Õë
+	ByteCount-ÒªÐ´ÈëµÄ×Ö½ÚÁ¿
+	·µ»Ø£º>=0-Êµ¼ÊÐ´ÈëµÄÊýÁ¿£»<0-Òì³£
 	*/
 	int (*Write)(unsigned int Address, const char* FromData, unsigned int ByteCount);
-	/*å‡½æ•°è¯´æ˜Žï¼šæ“¦é™¤æŒ‡å®šåœ°å€æ‰€åœ¨çš„æ‰‡åŒºæˆ–è€…é¡µ
-	å‚æ•°è¯´æ˜Žï¼š
-	è¾“å…¥å‚æ•°ï¼š
-	StartAddress-è¦æ“¦é™¤åŒºåŸŸçš„èµ·å§‹åœ°å€
-	Length-è¦æ“¦é™¤åŒºåŸŸçš„å­—èŠ‚é•¿åº¦
-	è¿”å›žï¼š>=0-æˆåŠŸï¼›<0-å¤±è´¥
+	/*º¯ÊýËµÃ÷£º²Á³ýÖ¸¶¨µØÖ·ËùÔÚµÄÉÈÇø»òÕßÒ³
+	²ÎÊýËµÃ÷£º
+	ÊäÈë²ÎÊý£º
+	StartAddress-Òª²Á³ýÇøÓòµÄÆðÊ¼µØÖ·
+	Length-Òª²Á³ýÇøÓòµÄ×Ö½Ú³¤¶È
+	·µ»Ø£º>=0-³É¹¦£»<0-Ê§°Ü
 	*/
 	int (*Erase)(unsigned int StartAddress,unsigned int Length);
 
 	/*****************************************************************************
-	* å‡½ æ•° åï¼š IsErased
-	* å‡½æ•°åŠŸèƒ½ï¼š æ£€æŸ¥æŸä¸€æ®µé—ªå­˜æ˜¯å¦éœ€è¦æ“¦é™¤
-	* å‚    æ•°ï¼š StartAddress-å¼€å§‹åœ°å€
-	* å‚    æ•°ï¼š Length-è¦æ£€æŸ¥åŒºåŸŸçš„é•¿åº¦ï¼Œå•ä½ï¼šå­—èŠ‚,å¦‚æžœä¸º0ï¼Œåˆ™ä¸æ‰§è¡Œæ£€æŸ¥ä»»åŠ¡
-	* å‚    æ•°ï¼š EraseValue-è¿”å›žæ“¦é™¤åŽçš„å€¼ï¼Œå¦‚æžœä¸ºç©ºï¼Œåˆ™ä¸è¿”å›ž
-	* è¿”    å›žï¼š int ï¼Œéœ€è¦æ“¦é™¤çš„å­—èŠ‚æ•°
-	* æ    è¿°ï¼š
+	* º¯ Êý Ãû£º IsErased
+	* º¯Êý¹¦ÄÜ£º ¼ì²éÄ³Ò»¶ÎÉÁ´æÊÇ·ñÐèÒª²Á³ý
+	* ²Î    Êý£º StartAddress-¿ªÊ¼µØÖ·
+	* ²Î    Êý£º Length-Òª¼ì²éÇøÓòµÄ³¤¶È£¬µ¥Î»£º×Ö½Ú,Èç¹ûÎª0£¬Ôò²»Ö´ÐÐ¼ì²éÈÎÎñ
+	* ²Î    Êý£º EraseValue-·µ»Ø²Á³ýºóµÄÖµ£¬Èç¹ûÎª¿Õ£¬Ôò²»·µ»Ø
+	* ·µ    »Ø£º int £¬ÐèÒª²Á³ýµÄ×Ö½ÚÊý
+	* Ãè    Êö£º
 	
-	* å¼€ å‘ è€…ï¼šèµµæ˜Ž 
-	* æ—¥    æœŸï¼š 2022/08/01
+	* ¿ª ·¢ Õß£ºÕÔÃ÷ 
+	* ÈÕ    ÆÚ£º 2022/08/01
 	
-	* ä¿®æ”¹åŽ†å²ï¼š
-	** 1. æ–°åˆ›å»º
+	* ÐÞ¸ÄÀúÊ·£º
+	** 1. ÐÂ´´½¨
 	*****************************************************************************/
 	int (*IsNeedErase)(unsigned int* StartAddress,unsigned int Length,char* EraseValue);
 
-	/*å‡½æ•°è¯´æ˜Žï¼šå°†ä¸´æ—¶ç¼“å­˜åŒºä¸­çš„æ•°æ®å†™å…¥å­˜å‚¨
-	å‚æ•°è¯´æ˜Žï¼š
-	è¾“å…¥å‚æ•°ï¼š
-	Address-è¦å†™å…¥çš„åœ°å€
-	è¿”å›žï¼š>=0-å®žé™…å†™å…¥çš„æ•°é‡ï¼›<0-å¼‚å¸¸
+	/*º¯ÊýËµÃ÷£º½«ÁÙÊ±»º´æÇøÖÐµÄÊý¾ÝÐ´Èë´æ´¢
+	²ÎÊýËµÃ÷£º
+	ÊäÈë²ÎÊý£º
+	Address-ÒªÐ´ÈëµÄµØÖ·
+	·µ»Ø£º>=0-Êµ¼ÊÐ´ÈëµÄÊýÁ¿£»<0-Òì³£
 	*/
 	int (*Fulsh)(void);	
     /* other methods */
 
 /*****************************************************************************
-* å‡½ æ•° åï¼š State
-* å‡½æ•°åŠŸèƒ½ï¼š èŽ·å–å­˜å‚¨å™¨çš„çŠ¶æ€
-* å‚    æ•°ï¼š Address-å­˜å‚¨å™¨åœ°å€
-* è¿”    å›žï¼še_FlashState_tç±»åž‹çš„å€¼
-* æ    è¿°ï¼š è€ƒè™‘åˆ°FLASHå¯èƒ½åˆ†ä¸ºå¥½å‡ ä¸ªåŒºï¼Œæœ¬å‡½æ•°éœ€è¦æŒ‡å®šå­˜å‚¨å™¨åœ°å€
+* º¯ Êý Ãû£º State
+* º¯Êý¹¦ÄÜ£º »ñÈ¡´æ´¢Æ÷µÄ×´Ì¬
+* ²Î    Êý£º Address-´æ´¢Æ÷µØÖ·
+* ·µ    »Ø£ºe_FlashState_tÀàÐÍµÄÖµ
+* Ãè    Êö£º ¿¼ÂÇµ½FLASH¿ÉÄÜ·ÖÎªºÃ¼¸¸öÇø£¬±¾º¯ÊýÐèÒªÖ¸¶¨´æ´¢Æ÷µØÖ·
 
-* å¼€ å‘ è€…ï¼šèµµæ˜Ž 
-* æ—¥    æœŸï¼š 2023-04-14
+* ¿ª ·¢ Õß£ºÕÔÃ÷ 
+* ÈÕ    ÆÚ£º 2023-04-14
 
-* ä¿®æ”¹åŽ†å²ï¼š
-** 1. æ–°åˆ›å»º
+* ÐÞ¸ÄÀúÊ·£º
+** 1. ÐÂ´´½¨
 
  *****************************************************************************/
 	e_StorageState_t (*State)(unsigned int Address);
 
 /*****************************************************************************
-* å‡½ æ•° åï¼š DisableEWProtect,EnableEWProtect
-* å‡½æ•°åŠŸèƒ½ï¼š å…³é—­æ“¦å†™ä¿æŠ¤ï¼Œä½¿èƒ½æ“¦å†™ä¿æŠ¤
-* å‚    æ•°ï¼š Address-å­˜å‚¨å™¨åœ°å€
-* å‚    æ•°ï¼š Size-ä¿æŠ¤åŒºå¤§å°
-* è¿”    å›žï¼š è´Ÿæ•°-å¼‚å¸¸ç ï¼Œéžè´Ÿæ•°-å®žé™…å…³è”çš„å¤§å°
-* æ    è¿°ï¼š 
+* º¯ Êý Ãû£º DisableEWProtect,EnableEWProtect
+* º¯Êý¹¦ÄÜ£º ¹Ø±Õ²ÁÐ´±£»¤£¬Ê¹ÄÜ²ÁÐ´±£»¤
+* ²Î    Êý£º Address-´æ´¢Æ÷µØÖ·
+* ²Î    Êý£º Size-±£»¤Çø´óÐ¡
+* ·µ    »Ø£º ¸ºÊý-Òì³£Âë£¬·Ç¸ºÊý-Êµ¼Ê¹ØÁªµÄ´óÐ¡
+* Ãè    Êö£º 
 
-* å¼€ å‘ è€…ï¼šèµµæ˜Ž 
-* æ—¥    æœŸï¼š 2023-04-14
+* ¿ª ·¢ Õß£ºÕÔÃ÷ 
+* ÈÕ    ÆÚ£º 2023-04-14
 
-* ä¿®æ”¹åŽ†å²ï¼š
-** 1. æ–°åˆ›å»º
+* ÐÞ¸ÄÀúÊ·£º
+** 1. ÐÂ´´½¨
 
  *****************************************************************************/
 	bool (*DisableProtect)(unsigned int Address,unsigned int Size,bool RDPFlag);

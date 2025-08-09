@@ -218,6 +218,51 @@ static int T_PWMProcess(void)
 	zmThreadManager->RemoveThread(NULL);		//PWM已经启动成功，删除当前任务，避免再次启动
 	return ZT_ENDED;
 }
+
+/*============================================ I2C对象 ================================================================================*/
+static int T_I2CProcess_Master(void)
+{
+	static const s_com_Setting_t _TestI2CSetting=Append_I2CNode_Setting(0x38);
+	static const s_Queue_cfg_t _RTQueueConfig=Append_QueueConfig(8,2);
+	s_com_init_t _ComInitParm={.SendQueueConfig=&_RTQueueConfig,.ReceiveQueueConfig=&_RTQueueConfig};
+	static c_I2CNode_t* testI2C=NULL;
+
+	ZT_BEGIN();
+	if(testI2C==NULL)
+	{
+		testI2C=New_I2CNode(I2C_Node_ID,&_TestI2CSetting);
+		zmI2CManager->Open(&testI2C->use_as__c_com_t,NULL);
+	}
+
+	while(1)
+	{
+		static const char __ACCMD[]={0x70,0xac,0x33,0x00};
+		static unsigned char ReadTo[16];
+		static unsigned int StartTick_R;
+
+		zmI2CManager->Write(&testI2C->use_as__c_com_t,__ACCMD,sizeof(__ACCMD));		//下发命令
+		YW_PrintfInfo("I2C发送>>");
+		YW_PrintfData(0,__ACCMD,4);
+		ZT_WAIT_UNTIL(zmI2CManager->Read(&testI2C->use_as__c_com_t,(char*)ReadTo,7)!=COM_OPRST_PortIsBusy);	//等待命令下发完毕后开始读取数据
+		StartTick_R=zmSys->GetmTick();
+		while(zmI2CManager->ReceiveByteCount(&testI2C->use_as__c_com_t,0)<=0)
+		{
+			ZT_Sleep(10);
+			if(zmSys->GetmTickSpan(StartTick_R)>=100)
+			{	
+				YW_PrintfInfo("I2C读取超时");
+				ZT_TimeOut();
+			}
+		};
+
+		zmI2CManager->Read(&testI2C->use_as__c_com_t,(char*)ReadTo,8);
+		YW_PrintfInfo("I2C读取<<");
+		YW_PrintfData(0,ReadTo,8);
+		ZT_Sleep(10000);
+	}
+	ZT_END();
+}
+
 /*============================================ 主任务 ================================================================================*/
  
 static int T_Process(void)
@@ -250,6 +295,7 @@ static void T_Start(void)
 	zmThreadManager->CreateAddThread(T_FlashTestProcess,Thread_YXJ_CallByLunXun,true);		//FLASH测试任务
 	zmThreadManager->CreateAddThread(T_UartProcess,Thread_YXJ_CallByLunXun,true);		//串口测试任务
 	zmThreadManager->CreateAddThread(T_PWMProcess,Thread_YXJ_CallByLunXun,true);		//PWM测试任务
+	zmThreadManager->CreateAddThread(T_I2CProcess_Master,Thread_YXJ_CallByLunXun,true);		//PWM测试任务
 }
 
 /*============================================ 任务开始 ================================================================================*/

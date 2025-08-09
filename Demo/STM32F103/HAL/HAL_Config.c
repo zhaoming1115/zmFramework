@@ -30,6 +30,7 @@ const s_UartAutoContrlParm_t G_UartAutoContrlParmS[ZHL_Uart_Count]={Append_UartA
 																	Append_UartAutoContrlParm(ZHL_GPIO_None,1,ZHL_GPIO_None,ZHL_GPIO_None),
 																	Append_UartAutoContrlParm(ZHL_GPIO_None,1,ZHL_GPIO_None,ZHL_GPIO_None)};
 
+const unsigned char G_I2CGPIOGroupS[ZHL_I2C_Count]={1,0};
 													
 void Storage_AddDevices(int (*AddStorageBlock)(const c_StorageBlock_t*  StorageBlock))
 {

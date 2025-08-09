@@ -21,6 +21,7 @@
 #include <cmsis_compiler.h>
 #include "../C_Extended.h"
 #include "Sys_cfg_Storage.h"
+#include <stdio.h>
 
 #define	Sys_Malloc(Size)		malloc(Size)
 #define	Sys_Free(Object)		free(Object)
@@ -28,12 +29,17 @@
 #define __InitRAM				__attribute__((section(".ARM.__at_0x20000000")))			
 #define __BootParmRAM			__attribute__((section(".bss.BootParm")))					
 
-#define Sys_PrintError			printf
-
 #define SYS_EVAL(__NAME,...)	 __PLOOC_EVAL(__NAME, __VA_ARGS__)
 	
-#define Debug_Level				1
+#define Sys_DebugLevel				1
 
+#define Sys_PrintfError			printf
+#if Sys_DebugLevel>=1
+#define Sys_PrintfMainInfo(...)		printf(__VA_ARGS__)
+#else
+#define Sys_PrintfMainInfo(...)		
+
+#endif
 
 inline static int Sys_DisableIRQ(void)
 {

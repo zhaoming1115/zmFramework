@@ -92,11 +92,11 @@ static int ElementInfo_Check(int MaxCount)
 			{
 				rst=zmStorageManager->Write((unsigned int)&ElementInfo->ElementAddr,(const char*)&newInfo.ElementAddr,sizeof(newInfo.ElementAddr));
 				if(rst>=0) break;
-				Sys_PrintError("写入元素地址时失败，原值=%08X，新值=%08X，异常吗=%d\n",ElementInfo->ElementAddr,newInfo.ElementAddr,rst);
+				Sys_PrintfError("写入元素地址时失败，原值=%08X，新值=%08X，异常吗=%d\n",ElementInfo->ElementAddr,newInfo.ElementAddr,rst);
 			}while(--count>0);
 			if(count<=0)
 			{
-				Sys_PrintError("多次尝试依然无法写入元素(%s)的地址\n",ElementInfo->Name);
+				Sys_PrintfError("多次尝试依然无法写入元素(%s)的地址\n",ElementInfo->Name);
 			}
 		}
 	}

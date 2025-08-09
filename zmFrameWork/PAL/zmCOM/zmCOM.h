@@ -20,13 +20,16 @@
 
 #include "zmSerialPort/zmSerialPort.h"
 #include "zmNet/zmNet.h"
+#include "zmI2C/zmI2C.h"
 #include "zmCOM_cfg.h"
 
 #define New_COM0()							({const c_com_t* SAFE_NAME(com)=NULL;\
 											SAFE_NAME(com);})
 
-#define New_COM3(__PortID,__Setting,__InitParm)		(zmCOM_GetType(__PortID)==zmCOM_Type_SerialPort)?(&(New_SerialPort(__PortID,__Setting,__InitParm)->use_as__c_com_t)): \
-													New_COM0()
+#define New_COM4(__PortID,__Setting,__InitParm,__EventHandler)		(zmCOM_GetType(__PortID)==zmCOM_Type_SerialPort)?(&(New_SerialPort(__PortID,__Setting,__InitParm,__EventHandler)->use_as__c_com_t)): \
+																	New_COM0()
+
+#define New_COM3(__PortID,__Setting,__InitParm)		New_COM4(__PortID,__Setting,__InitParm,NULL)
 #define New_COM2(__PortID,__Setting)				New_COM3(__PortID,__Setting,NULL)
 
 #define New_COM(...)						FUN_EVAL(New_COM, __VA_ARGS__)(__VA_ARGS__)

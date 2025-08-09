@@ -64,7 +64,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 static void M_InitDebugPort(void)
 {
-	MX_USART1_UART_Init(0);
+	MX_UART5_Init(0);
 }
 
 /* USER CODE END 0 */

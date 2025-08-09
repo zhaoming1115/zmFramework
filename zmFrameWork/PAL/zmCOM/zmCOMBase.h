@@ -77,6 +77,7 @@ typedef enum
 	COM_State_Connected,
 	COM_State_DisConnecting,
 	COM_State_DisConnected,
+	COM_State_Busy,
 }e_COM_State_t;
 
 

@@ -45,34 +45,27 @@
 #define Element_UnknownAddr				0xffffffffu
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code-generic-assoc"
+
 #define __Element_GetTypeID(__Element)                                               \
             _Generic((__Element),                                                   \
-              const unsigned char: DataType_Uint8,                        \
                     unsigned char: DataType_Uint8,                        \
-					  const char: DataType_int8,                        \
 							char: DataType_int8,                        \
-             const unsigned short: DataType_Uint16,                          \
                   unsigned short: DataType_Uint16,                          \
-					const short: DataType_int16,                         \
 							short: DataType_int16,                         \
-				const unsigned int: DataType_Uint32,                         \
 					unsigned int: DataType_Uint32,                         \
-						const int: DataType_int32,                        \
 							 int: DataType_int32,                        \
-		const unsigned long long: DataType_Uint64,                         \
 			unsigned long long: DataType_Uint64,                         \
-				const long long: DataType_int64,                        \
 					long long: DataType_int64,                        \
-                  const float   : DataType_float32,                         \
                         float   : DataType_float32,                         \
-                  const double  : DataType_float64,                         \
                         double  : DataType_float64,                         \
-           const unsigned char*  : sizeof(__Element),                         \
                   unsigned char*  : sizeof(__Element),                         \
-                    const char*  : (sizeof(__Element)>=128)?-128:-(char)sizeof(__Element), \
                        char*  :(sizeof(__Element)>=128)?-128:-(char)sizeof(__Element), \
 					default: DataType_Fun \
                    )
+
+#pragma clang diagnostic pop
 #define Element_GetTypeID(__Element)          __Element_GetTypeID(__Element)
 
 /*============================ TYPES =========================================*/

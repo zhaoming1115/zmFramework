@@ -82,6 +82,7 @@ typedef struct
 			unsigned char ReceiveMode;
 			unsigned char SendMode;
 		};
+		unsigned short I2CNodeAddr;
 	};
 	union
 	{
@@ -179,6 +180,39 @@ typedef union
 		Net_FrameFormat_Count,
 	};
 }u_NetFrameFormat_t;
+
+/*=========================================== I2C =================================================================*/
+typedef enum 
+{
+	I2C_SENDCBRT_SendOver,
+	I2C_SENDCBRT_NeedSending,
+}e_I2CSendCallBackResult_t;
+
+typedef enum
+{
+	I2C_ERR_Bus=1<<0,
+	I2C_ERR_ARLO=1<<1,
+	I2C_ERR_AckFail=1<<2,
+	I2C_ERR_OVR=1<<3,
+	I2C_ERR_PEC=1<<4,
+	I2C_ERR_BaoLiu=1<<5,
+	I2C_ERR_TIMEOUT=1<<6,
+	I2C_ERR_Msk=0x7f,
+	
+}e_I2CErrorType_t;
+
+typedef union
+{
+	unsigned char TransFormat;		//´«Êä¸ñÊ½
+	struct
+	{
+		unsigned char MasterFlag:1;		
+		unsigned char Addr16Flag:1;		
+//		unsigned char ReadFlag:1;	
+		unsigned char OtherFlag:6;		
+	};
+}u_I2CTransFormat_t;
+#define I2C_CreateTransFormatValue(__MasterFlag,__Addr16Flag)		((__MasterFlag) | (__Addr16Flag<<1))
 
 #endif
 

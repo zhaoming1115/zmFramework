@@ -185,7 +185,7 @@ const s_ElementInfo_t* Debug_GetElementInfoWithName(const char* Name)
 	const s_ElementInfo_t* ElementInfo=g_DebugRunParm.ElementInfos;
 	while(Element_InfoIsValid(ElementInfo))
 	{
-		if(!strncmp(ElementInfo->Name,Name,strlen(ElementInfo->Name)))
+		if(!strncmp(ElementInfo->Name,Name,sizeof(ElementInfo->Name)))
 		{
 			return ElementInfo;
 		}
@@ -205,8 +205,16 @@ const s_ElementInfo_t* Debug_GetElementInfoWithName(const char* Name)
 #define Debug_SetStringFlag(Value)		(*(Value)='"')
 #define Debug_IsAskForRead(Value)		(*(Value)=='%')
 #define Debug_IsHex(Value)				(Value[0]=='0' && (Value[1]=='x' || Value[1]=='X'))
-#define Debug_IsDoubleWordData(Value)	(strstr(Value,"ll"))
 #define Debug_IsRead(Value)				(*(Value)=='?' && *(Value)=='%')
+
+static bool Debug_IsDoubleWordData(const char* Value)
+{
+	const char* flagbase=strchr(Value,'l');
+	if(flagbase==NULL) return false;
+	flagbase++;
+	if((*flagbase)=='l' || (*flagbase)=='f') return true;
+	return false;
+}
 
 inline static const char* Debug_ValueIsHex(const char* Value)
 {
@@ -332,7 +340,14 @@ static u_ValueInfo_t Debug_GetNumberType(char* Value)
 	
 	if(Debug_IsAskForRead(Value))
 	{
-		ValueInfo.DataType=DataType_Uint64;
+		if(Debug_IsDoubleWordData(Value))
+		{
+			ValueInfo.DataType=DataType_Uint64;
+		}
+		else
+		{
+			ValueInfo.DataType=DataType_Uint32;
+		}
 		const char* Hexchar=Debug_ValueIsHex(Value);	//提取16进制格式
 		ValueInfo.HexFlag=(Hexchar)?(*Hexchar):0;			
 	}
@@ -498,12 +513,12 @@ static int Debug_ReadKeyValue(s_KeyValuePairInfo_t* KeyValueInfo,const char** Er
 			*(double*)KeyValueInfo->Value=*(float*)KeyValueInfo->Key.Address;
 			return 8;
 		}
-		else if(KeyValueInfo->ValueType<DataType_DoubleWordNumberBase)	
+		else if(KeyValueInfo->ValueType<DataType_DoubleWordNumberBase)	//数值类型按照32位处理
 		{
 			Debug_ReadFunList[KeyValueInfo->AddrKind](KeyValueInfo->Key.Address,KeyValueInfo->Value,4);
 			rst=4;
 		}
-		else if(KeyValueInfo->ValueType<=DataType_NumberEnd)	
+		else if(KeyValueInfo->ValueType<=DataType_NumberEnd)	//数值类型按照64位处理
 		{
 			Debug_ReadFunList[KeyValueInfo->AddrKind](KeyValueInfo->Key.Address,KeyValueInfo->Value,8);
 			rst=8;

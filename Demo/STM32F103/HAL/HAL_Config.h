@@ -114,7 +114,6 @@ extern char Image$$RW_RAM1$$ZI$$Base[];
 
 #define ZHL_FLASH_FactoryBASE						0X0801f800		//工厂信息存储地址
 
-#define __AddressOfProgramInfo						__attribute__((section(".ARM.__at_"ZHL_ToString(ZHL_FLASH_ProgramInfoAddress))))	//程序信息偏移地址，包括程序版本、发布日期等，此项用于Boot程序访问
 #define ZHL_ProgramInfoOffsetAddress				(0x300)				//__AddressOfProgramInfo相对于ZHL_FLASH_BASE的偏移地址
 #define ZHL_FLASH_APPBASE							(ZHL_FLASH_BASE+ZHL_FLASH_BootSize)
 #define ZHL_FLASH_APPSIZE							ZHL_FLASH_APPDomainSize	//APP大小
@@ -178,7 +177,7 @@ GPIO使用整数索引法
 #define ZHL_DebugUart								USART1
 
 #else
-#define ZHL_DebugUart								USART1
+#define ZHL_DebugUart								UART5
 #endif
 #ifdef UART4
 #define ZHL_Uart_Index_Debug						((ZHL_DebugUart==UART5)?4: \
@@ -228,6 +227,13 @@ extern const s_UartAutoContrlParm_t G_UartAutoContrlParmS[ZHL_Uart_Count];
 #define ZHL_ADC_IsINJCHannel(CHannelIndex)			(CHannelIndex>=ZHL_ADC_SEG_Count)
 
 /*-------------------------ADC配置 ---------------------------------------------*/
+
+/*++++++++++++++++++++++++ I2C +++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+#define ZHL_I2C_Count								2
+#define ZHL_I2C_IRQPriority							2							//中断优先级
+extern const unsigned char G_I2CGPIOGroupS[ZHL_I2C_Count];
+
+/*-------------------------I2C ---------------------------------------------*/
 
 /*+++++++++++++++++++++++++  USB配置 ++++++++++++++++++++++++++++++++++++++++++++++*/
 

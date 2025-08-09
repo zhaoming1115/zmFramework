@@ -103,7 +103,7 @@ typedef union
 	struct
 	{
 		u_QueueAlarmState_t AlarmState;
-		unsigned short UserState;
+		unsigned char UserState;
 	};
 }u_QueueState_t;
 

@@ -109,8 +109,7 @@
 #define SPrintf_Table_User(ColumnNameTable,RowNameTable,DataTable,ColumnSpan,RowSpan,UserFun)
 #endif
 
-#define SPrintfData(Level,Data,Length)				SPrintf(Level,"Êý¾Ý:"); \
-													for(int ___DataID=0;___DataID<Length;___DataID++){\
+#define SPrintfData(Level,Data,Length)				for(int ___DataID=0;___DataID<Length;___DataID++){\
 														SPrintf(Level,"%02X ",((unsigned char*)Data)[___DataID]);\
 													} \
 													SPrintf(Level,"\n");

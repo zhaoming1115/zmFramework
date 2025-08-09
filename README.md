@@ -24,7 +24,7 @@ zmFrameWork框架专为MCU平台设计，其特点如下：
 	zmDebug——调试组件；
 	zmElementInfo——元素信息组件，用以对内存中的数据进行说明，主要为调试组件服务；
 	zmList——列表组件；
-	zmQueue——队列组件，包括自动分帧队列及队列写入组件；
+	zmQueue——队列组件，包括自动分帧队列及队列写入组件。其中自动分帧队列非常适合用于串口接收不定长数据帧的情况；
 	zmThead——基于ProtoThead开发的任务调度组件；
 	Sys.h——对外接口头文件；
 	Sys_cfg.h——对内配置头文件；
