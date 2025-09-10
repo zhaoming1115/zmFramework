@@ -1,22 +1,5 @@
-/*****************************************************************************
-----------------------------------开发者信息---------------------------------
-开 发 者：赵明
-
-----------------------------------文件信息------------------------------------
-文 件 名： UH_DMA.h 
-开发日期：2025-04-09 
-文件功能：相应C文件的头文件，定义C文件对外公开的数据类型、接口函数及全局变量。
-
-描    述：
-
------------------------------------版本信息-----------------------------------
-版    本：V1.0.0.0
-版本说明：新创建
-
-*******************************************************************************/
-
- #ifndef __U_H__D_M_A_H_
-#define __U_H__D_M_A_H_
+#ifndef __UH_DMA_H
+#define __UH_DMA_H
 #include "..\HAL_Config.h"
 #include "stm32f1xx_ll_dma.h"
 
@@ -26,50 +9,46 @@
 //	void (*DMATransReport)(int Flag);
 //}JG_DMAEventLX;
 
-typedef union
+typedef struct
 {
-	unsigned int CTRLValue;
-	struct
+	union
 	{
-		unsigned int EN:1;		//通道使能
-		unsigned int TCIEN:1;	//传输完成中断使能
-		unsigned int HalfTCIEN:1;	//半传输完成中断使能
-		unsigned int ErrIEN:1;	//异常中断使能
-		unsigned int DTDir:1;	//0-外设为源；1-存储器为源
-		unsigned int LoopModeEN:1;		//循环模式使能
-		unsigned int PICEN:1;		//外设地址递增使能
-		unsigned int MICEN:1;		//存储器地址递增使能
-		unsigned int PDataWidth:2;		//0-8bit;1-16bit;2-32bit;3-保留
-		unsigned int MDataWidth:2;
-		unsigned int YouXianJi:2;	//0~3-从低到高
-		unsigned int M2M:1;			//存储器到存储器模式
-		unsigned int REV:17;	//保留
+		unsigned int CTRLValue;
+		struct
+		{
+			unsigned int EN:1;		//通道使能
+			unsigned int TCIEN:1;	//传输完成中断使能
+			unsigned int HalfTCIEN:1;	//半传输完成中断使能
+			unsigned int ErrIEN:1;	//异常中断使能
+			unsigned int DTDir:1;	//0-外设为源；1-存储器为源
+			unsigned int LoopModeEN:1;		//循环模式使能
+			unsigned int PICEN:1;		//外设地址递增使能
+			unsigned int MICEN:1;		//存储器地址递增使能
+			unsigned int PDataWidth:2;		//0-8bit;1-16bit;2-32bit;3-保留
+			unsigned int MDataWidth:2;
+			unsigned int YouXianJi:2;	//0~3-从低到高
+			unsigned int M2M:1;			//存储器到存储器模式
+			unsigned int REV:17;	//保留
 
+		};
 	};
-}LH_DMACHannelCtrlLX;
+	unsigned char IRQPriority;
+}s_DMACHannelInitParm_t;
+
 #pragma pack()
 
 inline static DMA_TypeDef* UH_DMA_GetDMA(int CHannelID)
 {
-#ifdef DMA2
 	return (CHannelID<ZHL_DMA_CHannelsPerDMA)?DMA1:DMA2;
-#else
-	return DMA1;
-#endif
 }
 
 inline static DMA_Channel_TypeDef* UH_DMA_GetCHannel(int CHannelID)
 {
-#ifdef DMA2
-	unsigned int Addr=(CHannelID<ZHL_DMA_CHannelsPerDMA)? DMA1_Channel1_BASE:DMA2_Channel1_BASE;
-#else
-	unsigned int Addr= DMA1_Channel1_BASE;
-#endif
-	Addr+=+(CHannelID%ZHL_DMA_CHannelsPerDMA)*0x14;
+	unsigned int Addr=((CHannelID<ZHL_DMA_CHannelsPerDMA)? DMA1_Channel1_BASE:DMA2_Channel1_BASE)+(CHannelID%ZHL_DMA_CHannelsPerDMA)*0x14;
 	return (DMA_Channel_TypeDef*)Addr;
 }
 
-void UH_DMA_InitCHannel(int CHannelIndex,const LH_DMACHannelCtrlLX* Ctrl,unsigned int PeriphAddr,void (*CallBack)(int CHannelID,int Flag));
+void UH_DMA_InitCHannel(int CHannelIndex,const s_DMACHannelInitParm_t* InitParm,unsigned int PeriphAddr,void (*CallBack)(int CHannelID,int Flag));
 
 inline static void UH_DMA_EnableIT(int CHannelIndex,int ITFlag)
 {

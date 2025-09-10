@@ -150,6 +150,8 @@ static void UH_I2C_PacketSendHandler(int PortIndex)
 	}
 }
 
+#define UH_I2C_DisableIT(__I2Cx,__IT)			ZHL_ClrBits(__I2Cx->CR2,__IT)
+
 static void I2Cx_EV_IRQHandler(int PortIndex)
 {
 	I2C_TypeDef * I2Cx=g_I2CTable[PortIndex];
@@ -163,11 +165,11 @@ static void I2Cx_EV_IRQHandler(int PortIndex)
 		{
 			if(UH_I2C_IsReceiveOneByte(Parm))
 			{
-				I2Cx->CR1 &=~ I2C_CR1_ACK;
+				ZHL_ClrBits(I2Cx->CR1,I2C_CR1_ACK);
 			}
 			else if(UH_I2C_IsReceiveTwoByte(Parm))
 			{
-				I2Cx->CR1 |= I2C_CR1_POS;
+				ZHL_SetBits(I2Cx->CR1,I2C_CR1_POS);
 			}
 		}
 		I2Cx->DR = *Parm->TBuffer++; // send header byte with write bit;
@@ -183,6 +185,10 @@ static void I2Cx_EV_IRQHandler(int PortIndex)
                sr1 = I2Cx->SR1;  // update status register copy
 				if(++Parm->RWCounter>=Parm->RWCount)
 				{
+					if(Parm->RWCounter>=Parm->RWCount)
+					{
+						LL_I2C_DisableIT_BUF(I2Cx);
+					}
 					UH_I2C_PacketSendHandler(PortIndex);
 				}
 
@@ -190,9 +196,7 @@ static void I2Cx_EV_IRQHandler(int PortIndex)
             if ((sr1 & I2C_SR1_BTF))
 			{
 				I2Cx->CR1|=I2C_CR1_STOP;
-				LL_I2C_DisableIT_EVT(I2Cx);
-				LL_I2C_DisableIT_BUF(I2Cx);
-				LL_I2C_DisableIT_ERR(I2Cx);
+				UH_I2C_DisableIT(I2Cx,I2C_CR2_ITERREN | I2C_CR2_ITEVTEN);
 				UHC_I2C_DataSended(PortIndex);
 				I2CPrintf("I2C·¢ËÍÍê±Ï\n");
 			} // last byte not yet sent
@@ -210,20 +214,34 @@ static void I2Cx_EV_IRQHandler(int PortIndex)
                     I2Cx->CR1 &= ~I2C_CR1_ACK; // last byte nack
                 }
             } else {
-                while (sr1 & I2C_SR1_RXNE)
-				{ // data available
-                    if (Parm->RWCount-Parm->RWCounter == 2)
-					{ // 2 bytes remaining
-                        I2Cx->CR1 |= I2C_CR1_STOP; // stop after last byte
-                    }
+                while (LL_I2C_IsActiveFlag_RXNE(I2Cx))
+				{ 
+					if (Parm->RWCount-Parm->RWCounter == 2)
+					{ 
+						if(LL_I2C_IsActiveFlag_BTF(I2Cx))
+						{
+							I2Cx->CR1 |= I2C_CR1_STOP; // stop after last byte
+						}
+						else 
+						{
+							if(LL_I2C_IsEnabledIT_BUF(I2Cx))
+							{
+								UH_I2C_DisableIT(I2Cx,I2C_CR2_ITBUFEN);
+							}
+							break;
+						}
+					}
 					else if (Parm->RWCount-Parm->RWCounter == 3)
-					{ // 3 bytes remaining
-                        if (!(sr1 & I2C_SR1_BTF)) break; // assure 2 bytes are received
-                        I2Cx->CR1 &= ~I2C_CR1_ACK; // last byte nack
-                    }
-                    *Parm->RBuffer++ = I2Cx->DR; // read data
+					{ 
+						if (!LL_I2C_IsActiveFlag_BTF(I2Cx))
+						{
+							UH_I2C_DisableIT(I2Cx,I2C_CR2_ITBUFEN);
+							break; // assure 2 bytes are received
+						}
+						I2Cx->CR1 &= ~I2C_CR1_ACK; // last byte nack
+					}
+					*Parm->RBuffer++ = I2Cx->DR; // read data
 					Parm->RWCounter++;
-                    sr1 = I2Cx->SR1;  // update status register copy
                 }
 				if(Parm->RWCount<=Parm->RWCounter)
 				{

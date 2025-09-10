@@ -32,14 +32,29 @@ typedef struct
 
 static JG_DMARunParmLX g_RunParm[ZHL_DMA_CHannelCount];
 
-void UH_DMA_InitCHannel(int CHannelIndex,const LH_DMACHannelCtrlLX* Ctrl,unsigned int PeriphAddr,void (*CallBack)(int CHannelID,int Flag))
+void UH_DMA_InitCHannel(int CHannelIndex,const s_DMACHannelInitParm_t* InitParm,unsigned int PeriphAddr,void (*CallBack)(int CHannelID,int Flag))
 {
 	DMA_TypeDef* DMA=UH_DMA_GetDMA(CHannelIndex);
 	DMA_Channel_TypeDef* DMACHannel=UH_DMA_GetCHannel(CHannelIndex);
+	int IRQn;
+	if(DMA==DMA1)
+	{
+		IRQn=DMA1_Channel1_IRQn+CHannelIndex;
+		LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
+	}
+	else
+	{
+		int InnerID=CHannelIndex-ZHL_DMA_CHannelsPerDMA;
+		IRQn=(InnerID==4)?DMA2_Channel1_IRQn+3:DMA2_Channel1_IRQn+InnerID;
+		LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA2);
+	}
 	DMA->IFCR&=~0xf<<((CHannelIndex % ZHL_DMA_CHannelsPerDMA)<<2);	//清除所有该通道中断
-	DMACHannel->CCR=Ctrl->CTRLValue;
+	DMACHannel->CCR=InitParm->CTRLValue;
 	DMACHannel->CPAR=PeriphAddr;
 	g_RunParm[CHannelIndex].CallBack=CallBack;
+	
+	NVIC_SetPriority(IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),InitParm->IRQPriority, 0));
+	NVIC_EnableIRQ(IRQn);
 }
 
 inline static void UH_DMA_OnEvent(DMA_TypeDef* DMA,int CHannelID)

@@ -1,34 +1,17 @@
-/*****************************************************************************
-----------------------------------开发者信息---------------------------------
-开 发 者：赵明
-
-----------------------------------文件信息------------------------------------
-文 件 名： UH_Uart.c 
-开发日期：2025-04-09 
-文件功能：
-
-描    述：
-
-依赖接口：
-
-提供接口：
-	
-
------------------------------------版本信息-----------------------------------
-版    本：V1.0.0.0
-版本说明：新创建
-
-*******************************************************************************/
 #include <string.h>
 #include "..\Inc\UH_Uart.h"
 #include "../Inc/UH_GPIO.h"
 #include "..\Inc\UH_DMA.h"
+#include "stm32f1xx_ll_usart.h"
+#include "stm32f1xx_ll_rcc.h"
+
 #if ZHL_CDC_Count>0 && (defined(USB) || defined(USB_OTG_FS))
 #include "usbd_cdc_if.h"
 
 #endif
 
 #define __Uart_UseTestCounter		0
+//#define __Uart_DebugTCUart			3
 
 #pragma pack (4)
 typedef struct
@@ -92,13 +75,10 @@ __weak void MX_USART3_UART_Init(unsigned char PinGroupID)
 
 #if ZHL_Uart_Count<4
 #define _InitFunctionTable	MX_USART1_UART_Init,MX_USART2_UART_Init,MX_USART3_UART_Init
-#define _UartTable			USART1,USART2,USART3		
+#define _g_UartTable			USART1,USART2,USART3		
 #define _UartDMATalbe		DMA1,DMA1,DMA1
 #define _UARTDMACHannelRTable		Uart1_RxDMA,Uart2_RxDMA,Uart3_RxDMA
 #define _UartDMACHannelTTable		Uart1_TxDMA,Uart2_TxDMA,Uart3_TxDMA
-
-#define _RunParmNull		{0,0,NULL,NULL}
-static JG_RunParmPerUartLX g_UartParmTable[]={_RunParmNull,_RunParmNull,_RunParmNull,_RunParmNull,_RunParmNull,_RunParmNull,_RunParmNull,_RunParmNull};
 
 #else
 #if ZHL_Uart_Count>=4
@@ -115,8 +95,8 @@ __weak void MX_UART4_Init(unsigned char PinGroupID)
 #endif
 
 #if ZHL_Uart_Count==4
-#define _InitFunctionTable	MX_USART1_UART_Init,MX_USART2_UART_Init,MX_USART3_UART_Init,MX__UART4_Init
-#define _UartTable			USART1,USART2,USART3,UART4	
+#define _InitFunctionTable	MX_USART1_UART_Init,MX_USART2_UART_Init,MX_USART3_UART_Init,MX_UART4_Init
+#define _g_UartTable			USART1,USART2,USART3,UART4		
 
 #else
 static JG_RunParmLX g_RunParm;
@@ -139,7 +119,7 @@ __weak void MX_UART8_Init(unsigned char PinGroupID)
 {
 }
 
-#define _InitFunctionTable	MX_USART1_UART_Init,MX_USART2_UART_Init,MX_USART3_UART_Init,MX_UART4_Init,MX_UART5_Init
+#define _InitFunctionTable	MX_USART1_UART_Init,MX_USART2_UART_Init,MX_USART3_UART_Init,MX_UART4_Init,MX_UART5_Init,MX_USART6_UART_Init,MX_UART7_Init,MX_UART8_Init
 #define _UartTable			USART1,USART2,USART3,UART4,UART5
 
 #define _RunParmNull		{0,0,NULL,NULL}
@@ -212,13 +192,16 @@ inline static void UH_Uart_SignalToReceived(int UartIndex)
 	UH_Uart_SHowSendSignal(UartIndex);
 }
 
+#define UH_Uart_EnableSendOverIRQ(__Uartx)				LL_USART_EnableIT_TC(__Uartx)
+
 static unsigned short g_RxCounts[ZHL_Uart_Count];
 
 void UH_UART_Init(int UartIndex,const s_com_Setting_t* Setting)
 {
-#define __UartDMAConfig(Dir,LoopMode) {.EN=0,.TCIEN=1,.HalfTCIEN=LoopMode,.ErrIEN=0,.DTDir=Dir,.LoopModeEN=LoopMode,.PICEN=0,.MICEN=1,.PDataWidth=0,.MDataWidth=0,.YouXianJi=0,.M2M=0,.REV=0}
-	static const LH_DMACHannelCtrlLX _RDMACtrl[]={__UartDMAConfig(0,0),__UartDMAConfig(0,1)};
-	static const LH_DMACHannelCtrlLX _TDMACtrl[]={__UartDMAConfig(1,0),__UartDMAConfig(1,1)};
+#define __UartDMAConfig(Dir,LoopMode) {.EN=0,.TCIEN=1,.HalfTCIEN=LoopMode,.ErrIEN=0,.DTDir=Dir,.LoopModeEN=LoopMode,.PICEN=0,.MICEN=1,\
+										.PDataWidth=0,.MDataWidth=0,.YouXianJi=0,.M2M=0,.REV=0,.IRQPriority=ZHL_Uart_DMAIRQPriority}
+	static const s_DMACHannelInitParm_t _RDMACtrl[]={__UartDMAConfig(0,0),__UartDMAConfig(0,1)};
+	static const s_DMACHannelInitParm_t _TDMACtrl[]={__UartDMAConfig(1,0),__UartDMAConfig(1,1)};
 	void (*UartInitFunTable[])(unsigned char)={_InitFunctionTable};
 	void (*CallBack)(int,int);
 	JG_RunParmPerUartLX* _UartParm;
@@ -237,7 +220,6 @@ void UH_UART_Init(int UartIndex,const s_com_Setting_t* Setting)
 		UartInitFunTable[id](AutoContrlParm->RxGPIOGroup);
 		Uart=g_UartTable[id];
 		LL_USART_ClearFlag_TC(Uart);
-		
 		if(Setting->ReceiveMode==SerialPort_RWMode_Circle )
 		{
 			CallBack=NULL;
@@ -264,23 +246,29 @@ void UH_UART_Init(int UartIndex,const s_com_Setting_t* Setting)
 		break;
 #if ZHL_Uart_Count>=5
 	case 4:
+#endif
+#if ZHL_Uart_Count>=6
 	case 5:
+#endif
+#if ZHL_Uart_Count>=7
 	case 6:
+#endif
+#if ZHL_Uart_Count>=8
 	case 7:
+#endif
 		memset(&g_UartParmTable[id],0,sizeof(g_UartParmTable[id]));
 		Uart=g_UartTable[id];
 		UartInitFunTable[id](AutoContrlParm->RxGPIOGroup);
 		LL_USART_ClearFlag_TC(Uart);
-		if(Setting->SendMode)
-		{
-			LL_USART_EnableIT_TC(Uart);
-		}
-		else
+//		if(Setting->SendMode)
+//		{
+//			UH_Uart_EnableSendOverIRQ(Uart);
+//		}
+//		else
 		{
 			LL_USART_DisableIT_TC(Uart);
 		}
 		break;
-#endif
 
 	default:
 		return;
@@ -342,16 +330,25 @@ int UH_UART_SendData(int UartIndex,const char* Data,int Length)
 #endif
 		DMAChannel=g_UartDMACHannelTTable[UartIndex];
 		UH_DMA_SuspendTrans(DMAChannel);
+		LL_USART_ClearFlag_TC(Uart);
 		UH_DMA_ContinueTrans(DMAChannel,(unsigned int)Data,Length);
+		UH_Uart_EnableSendOverIRQ(Uart);
 //		LL_USART_EnableDMAReq_TX(Uart);
 		return Length;
 		break;
 
 #if ZHL_Uart_Count>=5
 	case 4:
+#endif
+#if ZHL_Uart_Count>=6
 	case 5:
+#endif
+#if ZHL_Uart_Count>=7
 	case 6:
+#endif
+#if ZHL_Uart_Count>=8
 	case 7:
+#endif
 		Uart=g_UartTable[UartIndex];
 		UH_Uart_SignalToSend(UartIndex);
 		_UartParm=&g_UartParmTable[UartIndex];
@@ -361,8 +358,8 @@ int UH_UART_SendData(int UartIndex,const char* Data,int Length)
 		LL_USART_DisableDirectionTx(Uart);
 		LL_USART_EnableDirectionTx(Uart);
 		LL_USART_EnableIT_TXE(Uart);
+		UH_Uart_EnableSendOverIRQ(Uart);
 		return Length;
-#endif
 	default:
 #if ZHL_CDC_Count
 		UartIndex-=ZHL_Uart_Count;
@@ -396,16 +393,6 @@ int UH_UART_SendChar(int UartIndex,const char data)
 	}
 #endif
 	return 0;
-}
-
-void UH_UART_EnableTCInterrupt(int UartIndex)
-{
-	if(UartIndex<ZHL_Uart_Count)
-	{
-		if(UartIndex>=4) LL_USART_DisableIT_TXE(g_UartTable[UartIndex]);
-		LL_USART_ClearFlag_TC(g_UartTable[UartIndex]);
-		LL_USART_EnableIT_TC(g_UartTable[UartIndex]);
-	}
 }
 
 void UH_UART_DeInit(int UartIndex)
@@ -450,9 +437,16 @@ void UH_UART_StartReceived(int UartIndex,char* Data,int Length)
 
 #if ZHL_Uart_Count>=5
 	case 4:
+#endif
+#if ZHL_Uart_Count>=6
 	case 5:
+#endif
+#if ZHL_Uart_Count>=7
 	case 6:
+#endif
+#if ZHL_Uart_Count>=8
 	case 7:
+#endif
 		UH_Uart_GotoReceiveMode(UartIndex);
 		Uart=g_UartTable[UartIndex];
 		g_RxCounts[UartIndex]=Length;
@@ -461,7 +455,6 @@ void UH_UART_StartReceived(int UartIndex,char* Data,int Length)
 		_UartParm->RBuffer=Data;
 		LL_USART_EnableIT_RXNE(Uart);
 		break;
-#endif
 
 	default:
 #if ZHL_CDC_Count
@@ -495,40 +488,18 @@ bool UH_UART_IsOpen(int UartIndex)
 
 bool UH_UART_IsSending(int UartIndex)
 {
-	USART_TypeDef * Uart;
-	switch(UartIndex)
+	if(UartIndex<ZHL_Uart_Count)
 	{
-	case 0:
-	case 1:
-	case 2:
-#if ZHL_Uart_Count>=4
-	case 3:
-#endif
-		return UH_DMA_CHannelIsEnable(g_UartDMACHannelTTable[UartIndex]) || LL_USART_IsEnabledIT_TC(g_UartTable[UartIndex]);
-		break;
-
-#ifdef UART5
-
-	case 4:
-	case 5:
-	case 6:
-	case 7:
-		Uart=g_UartTable[UartIndex];
-		return LL_USART_IsEnabledIT_TXE(Uart) || LL_USART_IsEnabledIT_TC(g_UartTable[UartIndex]);
-		break;
-#endif
-
-	default:
-#if ZHL_CDC_Count
-		UartIndex-=ZHL_Uart_Count;
-		if(UartIndex<ZHL_CDC_Count)
-		{
-			return CDC_Transmit_IsSending(UartIndex);
-		}
-#endif
-		break;
+		return LL_USART_IsEnabledIT_TC(g_UartTable[UartIndex]);
 	}
+#if ZHL_CDC_Count
+	else
+	{
+		return CDC_Transmit_IsSending(UartIndex);
+	}
+#else
 	return false;
+#endif
 }
 
 inline static int UH_Uart_GetUartFlag(USART_TypeDef* Uart)
@@ -573,7 +544,7 @@ void Uart_IRQHandler(size_t UartIndex)
 	USART_TypeDef* Uart;
 	Uart=g_UartTable[UartIndex];
 
-	if (LL_USART_IsEnabledIT_TC(Uart)&&LL_USART_IsActiveFlag_TC(Uart))
+	if (LL_USART_IsEnabledIT_TC(Uart) && LL_USART_IsActiveFlag_TC(Uart))
 	{
 		LL_USART_ClearFlag_TC(Uart);
 		LL_USART_DisableIT_TC(Uart);		
@@ -585,7 +556,7 @@ void Uart_IRQHandler(size_t UartIndex)
 		UHC_UART_DataSended(UartIndex);
 	}
 
-	if (LL_USART_IsEnabledIT_IDLE(Uart)&&LL_USART_IsActiveFlag_IDLE(Uart))
+	if (LL_USART_IsEnabledIT_IDLE(Uart) && LL_USART_IsActiveFlag_IDLE(Uart))
 	{
 		int ErrorFlag=UH_Uart_GetUartFlag(Uart);
 
@@ -669,7 +640,7 @@ static void UH_UART_DMAReceivedReport(int CHannelID,int Flag)
 void Uart_IRQHandler_Add(size_t UartIndex)
 {
 	USART_TypeDef* Uart=g_UartTable[UartIndex];
-	if (LL_USART_IsEnabledIT_TXE(Uart)&&LL_USART_IsActiveFlag_TXE(Uart))
+	if (LL_USART_IsActiveFlag_TXE(Uart) && LL_USART_IsEnabledIT_TXE(Uart))
 	{
 		char data;
 		if(g_UartParmTable[UartIndex].TCounter==0)
@@ -691,7 +662,7 @@ void Uart_IRQHandler_Add(size_t UartIndex)
 			g_UartParmTable[UartIndex].TCounter--;
 		}
 	}
-	if (LL_USART_IsEnabledIT_TC(Uart)&&LL_USART_IsActiveFlag_TC(Uart))
+	if (LL_USART_IsActiveFlag_TC(Uart) && LL_USART_IsEnabledIT_TC(Uart))
 	{
 		LL_USART_ClearFlag_TC(Uart);
 		LL_USART_DisableIT_TC(Uart);
@@ -784,15 +755,6 @@ static void UH_UART_PacketSendHandler(int UartIndex)
 	{
 		UH_UART_SendData(UartIndex,datap,length);
 	}
-	else 
-	{
-//		LL_USART_DisableDMAReq_TX(Uart);
-		while(!LL_USART_IsActiveFlag_TXE(Uart))
-		{
-			LL_USART_ClearFlag_TC(Uart);
-		}
-		LL_USART_EnableIT_TC(Uart);
-	}
 }
 
 void UH_UART_SetBoTeLv(int UartNum,int BoTeLv)
@@ -815,8 +777,14 @@ void UH_UART_SetBoTeLv(int UartNum,int BoTeLv)
 #endif
 #if ZHL_Uart_Count>=5
 	case 4:
+#endif
+#if ZHL_Uart_Count>=6
 	case 5:
+#endif
+#if ZHL_Uart_Count>=7
 	case 6:
+#endif
+#if ZHL_Uart_Count>=8
 	case 7:
 #endif
 		tmp=rcc_clocks.PCLK1_Frequency;
@@ -852,8 +820,14 @@ int UH_UART_UpdateSetting(int UartNum,const s_com_Setting_t* const NewPortConfig
 #endif
 #if ZHL_Uart_Count>=5
 	case 4:
+#endif
+#if ZHL_Uart_Count>=6
 	case 5:
+#endif
+#if ZHL_Uart_Count>=7
 	case 6:
+#endif
+#if ZHL_Uart_Count>=8
 	case 7:
 #endif
 		tmp=rcc_clocks.PCLK1_Frequency;
@@ -946,8 +920,14 @@ int UH_UART_GetSetting(int UartNum,s_com_Setting_t* GetTo)
 #endif
 #if ZHL_Uart_Count>=5
 	case 4:
+#endif
+#if ZHL_Uart_Count>=6
 	case 5:
+#endif
+#if ZHL_Uart_Count>=7
 	case 6:
+#endif
+#if ZHL_Uart_Count>=8
 	case 7:
 #endif
 		tmp=rcc_clocks.PCLK1_Frequency;
@@ -1014,13 +994,19 @@ unsigned short UH_UART_GetRxOffsetAddr(int UartIndex)
 	case 2:
 #if ZHL_Uart_Count>=4
 	case 3:
-#endif
 		return g_RxCounts[UartIndex]-UH_DMA_GetRemLength(g_UARTDMACHannelRTable[UartIndex]);
 		break;
+#endif
 #if ZHL_Uart_Count>=5
 	case 4:
+#endif
+#if ZHL_Uart_Count>=6
 	case 5:
+#endif
+#if ZHL_Uart_Count>=7
 	case 6:
+#endif
+#if ZHL_Uart_Count>=8
 	case 7:
 #endif
 		return g_RxCounts[UartIndex]-g_UartParmTable[UartIndex].RCounter;
@@ -1065,16 +1051,22 @@ unsigned short UH_UART_GetTxOffsetAddr(int UartIndex)
 	case 2:
 #if ZHL_Uart_Count>=4
 	case 3:
-#endif
 		return UH_DMA_GetRemLength(g_UartDMACHannelTTable[UartIndex]);
 		break;
+#endif
 #if ZHL_Uart_Count>=5
 	case 4:
+#endif
+#if ZHL_Uart_Count>=6
 	case 5:
+#endif
+#if ZHL_Uart_Count>=7
 	case 6:
+#endif
+#if ZHL_Uart_Count>=8
 	case 7:
 #endif
-		return g_UartParmTable[UartIndex].TCounter;
+		return g_RunParm.Uart5Parm.TCounter;
 		break;
 	
 	default:
