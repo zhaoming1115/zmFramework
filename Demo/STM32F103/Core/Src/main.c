@@ -27,7 +27,6 @@
 #include "usart.h"
 #include "../../HAL/HAL_Config.h"
 #include "Test.h"
-#include <RTE_Components.h>
 #if defined(RTE_Compiler_EventRecorder)
 #   include <EventRecorder.h>
 #endif

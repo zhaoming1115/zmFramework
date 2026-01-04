@@ -78,6 +78,12 @@ typedef enum
 	COM_State_DisConnecting,
 	COM_State_DisConnected,
 	COM_State_Busy,
+	COM_State_BaseBits=4,
+	COM_State_BaseMak=(1<<COM_State_BaseBits)-1,
+	COM_State_Sending=1<<4,
+	COM_State_Receivinging=1<<5,
+
+	// COM_State_Busy,
 }e_COM_State_t;
 
 
@@ -86,6 +92,7 @@ typedef struct com_init_t
     //! put your configuration members here
 	const s_Queue_cfg_t* ReceiveQueueConfig;
 	const s_Queue_cfg_t* SendQueueConfig;
+	const s_com_Setting_t* ComSetting;
 } s_com_init_t;
 
 /*! \NOTE: Make sure #include "plooc_class.h" is close to the class definition 
@@ -186,10 +193,10 @@ def_interface(i_com_t)
 	
     e_ComOperationResult_t  (*Init)(__rwme, s_com_init_t *Setting,const i_comEventHandler_t* const EventHandler);
     void  (*DeInit)     (__rwme);
- 	e_ComOperationResult_t (*Open)(__constme,void* RunParm);
-	e_ComOperationResult_t (*Close)(__constme);
-	int (*Read)(__constme,char* ReadTo,int datalength);
-	int (*Write)(__constme,const char* DataFrom,int datalength);
+ 	e_ComOperationResult_t (*Open)(__rwme,void* RunParm);
+	e_ComOperationResult_t (*Close)(__rwme);
+	int (*Read)(__rwme,char* ReadTo,int datalength);
+	int (*Write)(__rwme,const char* DataFrom,int datalength);
 /*****************************************************************************
 * 函 数 名： ReceiveByteCount
 * 函数功能：获取接收到的字节数
@@ -205,7 +212,7 @@ def_interface(i_com_t)
 ** 1. 新创建
 
  *****************************************************************************/
-	int (*ReceiveByteCount)(__constme,bool FirstFrameFlag);
+	int (*ReceiveByteCount)(__rwme,bool FirstFrameFlag);
 /*****************************************************************************
 * 函 数 名： WriteBufferRemByteCount
 * 函数功能：获取发送缓存区剩余字节数
@@ -220,8 +227,8 @@ def_interface(i_com_t)
 ** 1. 新创建
 
  *****************************************************************************/
- 	int (*WriteBufferRemByteCount)(__constme);
-	e_COM_State_t (*GetState)(__constme);
+ 	int (*WriteBufferRemByteCount)(__rwme);
+	e_COM_State_t (*GetState)(__rwme);
 /*****************************************************************************
 * 函 数 名： PickReceivedStream
 * 函数功能：拾取接收到的数据流
@@ -237,7 +244,7 @@ def_interface(i_com_t)
 ** 1. 新创建
 
  *****************************************************************************/
-	char* (*PickReceivedStream)(__constme,int* datalength);
+	char* (*PickReceivedStream)(__rwme,int* datalength);
 /*****************************************************************************
 * 函 数 名： AskWriteBuffer
 * 函数功能：申请写入缓存
@@ -253,13 +260,14 @@ def_interface(i_com_t)
 ** 1. 新创建
 
  *****************************************************************************/
-	char* (*AskWriteBuffer)(__constme,int* datalength);
-	int (*GetSetting)(__constme,s_com_Setting_t* Parm);
-	int (*UpdateSetting)(__constme,const s_com_Setting_t* const Parm);
+	char* (*AskWriteBuffer)(__rwme,int* datalength);
+	int (*GetSetting)(__rwme,s_com_Setting_t* Parm);
+	int (*UpdateSetting)(__rwme,const s_com_Setting_t* const Parm);
 	
   /* other methods */
 
 end_def_interface(i_com_t) /*do not remove this for forward compatibility */
+
 //! @}
 
 /*============================ GLOBAL VARIABLES ==============================*/

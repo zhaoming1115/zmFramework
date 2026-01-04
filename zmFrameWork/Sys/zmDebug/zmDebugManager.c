@@ -68,8 +68,8 @@ typedef struct
 	char UserDebugOut;
 	char Mode;
 	unsigned short KeepSeconds;
-	const c_com_t* DefaultDebugPort;
-	const c_com_t* DebugPort;
+	c_com_t* DefaultDebugPort;
+	c_com_t* DebugPort;
 	const s_ElementInfo_t* ElementInfos;
 //	const JG_DebugCaoZuoKeyValuePairLX* CaoZuoKeyValueList;
 	const s_DebugManagerEvent_t* Event;
@@ -101,7 +101,7 @@ static int Debug_PickChar(void)
 }
 
 
-static void Debug_Init(const c_com_t* const DefaultDebugPort,const s_ElementInfo_t* ElementInfos,const s_DebugManagerEvent_t* const DebugManagerEvent )
+static void Debug_Init(c_com_t* const DefaultDebugPort,const s_ElementInfo_t* ElementInfos,const s_DebugManagerEvent_t* const DebugManagerEvent )
 {
 	memset(&g_DebugRunParm,0,sizeof(g_DebugRunParm));
 	g_DebugRunParm.DefaultDebugPort=DefaultDebugPort;
@@ -239,6 +239,10 @@ static int Debug_GetAddressWithName(s_KeyValuePairInfo_t* KeyValueInfo)
 	const s_ElementInfo_t* ElementInfo=Debug_GetElementInfoWithName(KeyValueInfo->Key.AddrName);
 	if(ElementInfo)
 	{
+		if(ElementInfo->Type==DataType_Fun && ElementInfo->ElementCount>1 && IndexFlag==NULL)
+		{
+			KeyValueInfo->ArrayIndex=-1;
+		}
 		if(ElementInfo->Type==DataType_Fun || Element_IsVaildArrayIndex(ElementInfo,KeyValueInfo->ArrayIndex))
 		{
 			KeyValueInfo->ValueType=ElementInfo->Type;		
@@ -930,7 +934,7 @@ static void Debug_Disable(void)
 	g_EnableFlag=false;
 }
 
-static void Debug_Start(const c_com_t* const DebugPort)
+static void Debug_Start(c_com_t* const DebugPort)
 {
 	if(DebugPort)
 	{
@@ -1020,7 +1024,7 @@ static int Debug_Print(const char* data,...)
 	}
 }
 
-static int Debug_CHeckEnter(const c_com_t* const Port,const char* Data,const char* ParmFormat,...)
+static int Debug_CHeckEnter(c_com_t* const Port,const char* Data,const char* ParmFormat,...)
 {
 	int len=sizeof(Debug_EnterCMD)-1;
 	int tmp=(strncmp(Data,Debug_EnterCMD,len))?-1:0;

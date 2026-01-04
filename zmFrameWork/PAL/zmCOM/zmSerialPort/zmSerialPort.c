@@ -183,7 +183,7 @@ static void UART_BeginRx(c_SerialPort_t* SerialPort)
 }
 
 static
-e_ComOperationResult_t  SerialPort_Open(const c_com_t* const me,void* RunParm)
+e_ComOperationResult_t  SerialPort_Open(c_com_t* const me,void* RunParm)
 {
 	class_internal(me, ptThis, c_SerialPort_t);		
 	protected_internal(&this->use_as__c_com_t,ptBase,c_com_t);
@@ -208,7 +208,7 @@ e_ComOperationResult_t  SerialPort_Open(const c_com_t* const me,void* RunParm)
 }
 
 static
-e_ComOperationResult_t  SerialPort_Close(const c_com_t* const me)
+e_ComOperationResult_t  SerialPort_Close(c_com_t* const me)
 {
 	class_internal(me, ptThis, c_SerialPort_t);		
 	class_internal(this->ReceiveQueue, Queue, c_Queue_t);	
@@ -222,7 +222,7 @@ e_ComOperationResult_t  SerialPort_Close(const c_com_t* const me)
 }
 
 static
-int  SerialPort_Read(const c_com_t* const me,char* ReadTo,int datalength)
+int  SerialPort_Read(c_com_t* const me,char* ReadTo,int datalength)
 {
 	if(datalength<=0) return COM_OPRST_ParmFail;
 	return COM_Read(me,ReadTo,datalength);
@@ -248,7 +248,7 @@ int  SerialPort_Read(const c_com_t* const me,char* ReadTo,int datalength)
 }
 
 static
-int  SerialPort_Write(const c_com_t* const me,const char* DataFrom,int datalength)
+int  SerialPort_Write(c_com_t* const me,const char* DataFrom,int datalength)
 {
 	if(datalength<=0) return COM_OPRST_ParmFail;
 	class_internal(me, ptThis, c_SerialPort_t);		
@@ -274,7 +274,7 @@ int  SerialPort_Write(const c_com_t* const me,const char* DataFrom,int datalengt
 }
 
 static
-int  SerialPort_ReceiveByteCount(const c_com_t* const me,bool FirstFrameFlag)
+int  SerialPort_ReceiveByteCount(c_com_t* const me,bool FirstFrameFlag)
 {
 	class_internal(me, ptThis, c_SerialPort_t);		
 	class_internal(this->ReceiveQueue, Queue, c_Queue_t);	
@@ -286,39 +286,39 @@ int  SerialPort_ReceiveByteCount(const c_com_t* const me,bool FirstFrameFlag)
 }
 
 static
-int  SerialPort_WriteBufferRemByteCount(const c_com_t* const me)
+int  SerialPort_WriteBufferRemByteCount(c_com_t* const me)
 {
 	return COM_WriteBufferRemByteCount(me);
 }
 
 static
-e_COM_State_t  SerialPort_GetState(const c_com_t* const me)
+e_COM_State_t  SerialPort_GetState(c_com_t* const me)
 {
 	char Index=zmCOM_GetIndexInType(me->PortIndex);
 	return (UH_UART_IsOpen(Index))?COM_State_Connected:COM_State_PortClosed;
 }
 
 static
-char*  SerialPort_PickReceivedStream(const c_com_t* const me,int* datalength)
+char*  SerialPort_PickReceivedStream(c_com_t* const me,int* datalength)
 {
 	return COM_PickReceivedStream(me,datalength);
 }
 
 static
-char*  SerialPort_AskWriteBuffer(const c_com_t* const me,int* datalength)
+char*  SerialPort_AskWriteBuffer(c_com_t* const me,int* datalength)
 {
 	return COM_AskWriteBuffer(me,datalength);
 }
 
 static
-int  SerialPort_GetSetting(const c_com_t* const me,s_com_Setting_t* Parm)
+int  SerialPort_GetSetting(c_com_t* const me,s_com_Setting_t* Parm)
 {
 	char Index=zmCOM_GetIndexInType(me->PortIndex);
 	return UH_UART_GetSetting(Index,Parm);
 }
 
 static 
-int  SerialPort_UpdateSetting(const c_com_t* const me,const s_com_Setting_t* const Parm)
+int  SerialPort_UpdateSetting(c_com_t* const me,const s_com_Setting_t* const Parm)
 {
 	char Index=zmCOM_GetIndexInType(me->PortIndex);
 	int Rst=UH_UART_UpdateSetting(Index,Parm);

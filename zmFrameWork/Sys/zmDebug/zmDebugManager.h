@@ -47,13 +47,13 @@ typedef struct
 
 typedef struct
 {
-	void (*Init)(const c_com_t* const Port,const s_ElementInfo_t* ElementInfos, const s_DebugManagerEvent_t* const DebugManagerEvent);
-	void (*Enable)(const c_com_t* const Port);
+	void (*Init)(c_com_t* const Port,const s_ElementInfo_t* ElementInfos, const s_DebugManagerEvent_t* const DebugManagerEvent);
+	void (*Enable)(c_com_t* const Port);
 	void (*Disable)(void);
 	bool (*IsEnable)(void);
 	int (*Write)(const char* data,int datalength);
 	int (*Print)(const char* data,...);
-	int (*CHeckEnter)(const c_com_t* const Port,const char* Data,const char* ParmFormat,...);
+	int (*CHeckEnter)(c_com_t* const Port,const char* Data,const char* ParmFormat,...);
 	int (*SwapDatas)(const char* InStream,char* OutStream);
 }i_DebugManager_t;
 

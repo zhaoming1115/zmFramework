@@ -161,7 +161,7 @@ static void I2C_BeginRx(c_I2CNode_t* I2CNode,char* To,int length)
 }
 
 static
-e_ComOperationResult_t  I2C_Open(const c_com_t* const me,void* RunParm)
+e_ComOperationResult_t  I2C_Open(c_com_t* const me,void* RunParm)
 {
 	class_internal(me, ptThis, c_I2CNode_t);		
 	protected_internal(&this->use_as__c_com_t,ptBase,c_com_t);
@@ -173,7 +173,7 @@ e_ComOperationResult_t  I2C_Open(const c_com_t* const me,void* RunParm)
 }
 
 static
-e_ComOperationResult_t  I2C_Close(const c_com_t* const me)
+e_ComOperationResult_t  I2C_Close(c_com_t* const me)
 {
 	class_internal(me, ptThis, c_I2CNode_t);		
 	class_internal(this->ReceiveQueue, Queue, c_Queue_t);	
@@ -188,7 +188,7 @@ e_ComOperationResult_t  I2C_Close(const c_com_t* const me)
 }
 
 static
-int  I2C_ReceiveByteCount(const c_com_t* const me,bool FirstFrameFlag)
+int  I2C_ReceiveByteCount(c_com_t* const me,bool FirstFrameFlag)
 {
 	class_internal(me, ptThis, c_I2CNode_t);	
 	if(this->ReceiveQueue==NULL) return 0;
@@ -197,7 +197,7 @@ int  I2C_ReceiveByteCount(const c_com_t* const me,bool FirstFrameFlag)
 }
 
 static
-int  I2C_Read(const c_com_t* const me,char* ReadTo,int datalength)
+int  I2C_Read(c_com_t* const me,char* ReadTo,int datalength)
 {
 	class_internal(me, ptThis, c_I2CNode_t);	
 	if(I2C_ReceiveByteCount(me,false)<=0)
@@ -240,7 +240,7 @@ int  I2C_Read(const c_com_t* const me,char* ReadTo,int datalength)
 }
 
 static
-int  I2C_Write(const c_com_t* const me,const char* DataFrom,int datalength)
+int  I2C_Write(c_com_t* const me,const char* DataFrom,int datalength)
 {
 	if(datalength<=0) return COM_OPRST_ParmFail;
 	class_internal(me, ptThis, c_I2CNode_t);		
@@ -271,13 +271,13 @@ int  I2C_Write(const c_com_t* const me,const char* DataFrom,int datalength)
 }
 
 static
-int  I2C_WriteBufferRemByteCount(const c_com_t* const me)
+int  I2C_WriteBufferRemByteCount(c_com_t* const me)
 {
 	return COM_WriteBufferRemByteCount(me);
 }
 
 static
-e_COM_State_t  I2C_GetState(const c_com_t* const me)
+e_COM_State_t  I2C_GetState(c_com_t* const me)
 {
 	class_internal(me, ptThis, c_I2CNode_t);		
 	char Index=zmCOM_GetIndexInType(me->PortIndex);
@@ -285,26 +285,26 @@ e_COM_State_t  I2C_GetState(const c_com_t* const me)
 }
 
 static
-char*  I2C_PickReceivedStream(const c_com_t* const me,int* datalength)
+char*  I2C_PickReceivedStream(c_com_t* const me,int* datalength)
 {
 	return COM_PickReceivedStream(me,datalength);
 }
 
 static
-char*  I2C_AskWriteBuffer(const c_com_t* const me,int* datalength)
+char*  I2C_AskWriteBuffer(c_com_t* const me,int* datalength)
 {
 	return COM_AskWriteBuffer(me,datalength);
 }
 
 static
-int  I2C_GetSetting(const c_com_t* const me,s_com_Setting_t* Parm)
+int  I2C_GetSetting(c_com_t* const me,s_com_Setting_t* Parm)
 {
 	char Index=zmCOM_GetIndexInType(me->PortIndex);
 	return UH_I2C_GetSetting(Index,Parm);
 }
 
 static 
-int  I2C_UpdateSetting(const c_com_t* const me,const s_com_Setting_t* const Parm)
+int  I2C_UpdateSetting(c_com_t* const me,const s_com_Setting_t* const Parm)
 {
 	char Index=zmCOM_GetIndexInType(me->PortIndex);
 	if(UH_I2C_IsBusy(Index)) return COM_OPRST_PortIsBusy;
@@ -317,7 +317,7 @@ int  I2C_UpdateSetting(const c_com_t* const me,const s_com_Setting_t* const Parm
 	
 }
 
-inline static void I2C_ClearBuffer(const c_I2CNode_t* const me)
+inline static void I2C_ClearBuffer(c_I2CNode_t* const me)
 {
 	return COM_ClearBuffer(&me->use_as__c_com_t);
 }

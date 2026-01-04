@@ -21,6 +21,7 @@
 #include "zmSerialPort/zmSerialPort.h"
 #include "zmNet/zmNet.h"
 #include "zmI2C/zmI2C.h"
+#include "zmSPI/zmSPI.h"
 #include "zmCOM_cfg.h"
 
 #define New_COM0()							({const c_com_t* SAFE_NAME(com)=NULL;\

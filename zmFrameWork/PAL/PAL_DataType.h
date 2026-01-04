@@ -214,6 +214,32 @@ typedef union
 }u_I2CTransFormat_t;
 #define I2C_CreateTransFormatValue(__MasterFlag,__Addr16Flag)		((__MasterFlag) | (__Addr16Flag<<1))
 
+
+/*************************************************** SPI *********************************************************************/
+typedef enum
+{
+	SPI_RWMode_Normal,		//常规模式，驱动层分帧，默认为此值
+	SPI_RWMode_Circle,		//循环收发模式，驱动层根据设定的收发缓存区循环收发
+}e_SPIRWMode_t;
+
+typedef union
+{
+	unsigned char FrameFormat;		//帧格式
+	struct
+	{
+			unsigned char MasterFlag:1;		//主模式标志 1-主，0-从
+			unsigned char UseNSS:1;			//1-使用NSS引脚，0-使用普通GPIO引脚
+			unsigned char CPOL:1;				//0-CLK引脚常态低电平	1-CLK引脚常态高电平
+			unsigned char CPHA:1;				//0-在第一个边沿采样	1-在第二个边沿采样
+			unsigned char DataUseBit16:1;		//0-8位数据，1-16位数据
+			unsigned char LSBFirst:1;		//低位优先标志，0-先发高位，1-先发低位
+			unsigned char REV:2;		//保留
+	};
+}u_SPIFrameFormat_t;
+#define SPI_CreateFrameFormatValue(__MasterFlag,__UseNSS,__CPOL,__CPHA,__DataUseBit16,__LSBFirst)	\
+					((__MasterFlag)|((__UseNSS)<<1)|((__CPOL)<<2)|((__CPHA)<<3)|((__DataUseBit16)<<4)|((__LSBFirst)<<5))
+
+
 #endif
 
 

@@ -263,6 +263,36 @@ static int T_I2CProcess_Master(void)
 	ZT_END();
 }
 
+/*============================================ SPI同步主设备对象 ================================================================================*/
+static c_SPIMasterNode_t g_SPISyncMasterNode=Append_SPISyncMasterNode(0,4);
+static int T_SPIMSProcess_Master(void)
+{
+	static const s_SPIMaster_cfg_t _SPINodeConfig={.Baudrate=10000000,.comType=zmCOM_Type_SPI,
+												.TransFormat=SPI_CreateFrameFormatValue(1,0,0,1,1,0)};
+	c_com_t* _SPIMasterNode=&g_SPISyncMasterNode.use_as__c_com_t;
+
+	ZT_BEGIN();
+	s_com_init_t InitParm={.ComSetting=&_SPINodeConfig.use_as__s_com_Setting_t,.ReceiveQueueConfig=NULL,.SendQueueConfig=NULL};
+	zmSPISyncMasterManager->Init(_SPIMasterNode,&InitParm,NULL);
+	zmSPISyncMasterManager->Open(_SPIMasterNode,NULL);
+
+	while(1)
+	{
+		static const char __ACCMD[]={0x12,0x34,0x56,0x78};
+		static unsigned char ReadTo[8];
+		static unsigned int StartTick_R;
+
+		_SPIMasterNode->Manager->Write(_SPIMasterNode,__ACCMD,sizeof(__ACCMD));		//下发数据
+		YW_PrintfInfo("SPI同步主节点发送>>");
+		YW_PrintfData(0,__ACCMD,4);
+		_SPIMasterNode->Manager->Read(_SPIMasterNode,(char*)ReadTo,sizeof(ReadTo));		//读取数据
+		YW_PrintfInfo("SPI同步主节点读取<<");
+		YW_PrintfData(0,ReadTo,8);
+		ZT_Sleep(10000);
+	}
+	ZT_END();
+}
+
 /*============================================ 主任务 ================================================================================*/
  
 static int T_Process(void)
@@ -295,7 +325,8 @@ static void T_Start(void)
 	zmThreadManager->CreateAddThread(T_FlashTestProcess,Thread_YXJ_CallByLunXun,true);		//FLASH测试任务
 	zmThreadManager->CreateAddThread(T_UartProcess,Thread_YXJ_CallByLunXun,true);		//串口测试任务
 	zmThreadManager->CreateAddThread(T_PWMProcess,Thread_YXJ_CallByLunXun,true);		//PWM测试任务
-	zmThreadManager->CreateAddThread(T_I2CProcess_Master,Thread_YXJ_CallByLunXun,true);		//PWM测试任务
+	zmThreadManager->CreateAddThread(T_I2CProcess_Master,Thread_YXJ_CallByLunXun,true);		//I2C主节点测试任务
+	zmThreadManager->CreateAddThread(T_SPIMSProcess_Master,Thread_YXJ_CallByLunXun,true);		//I2C主节点测试任务
 }
 
 /*============================================ 任务开始 ================================================================================*/
